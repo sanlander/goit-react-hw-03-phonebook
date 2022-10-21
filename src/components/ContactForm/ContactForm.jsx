@@ -1,74 +1,68 @@
-import { Component } from 'react';
 import { nanoid } from 'nanoid';
-import { Form, Label, Input, Button } from './ContactForm.modules';
+import { FormBox, Label, Input, Button, Error } from './ContactForm.modules';
 import { firstLetterToUppercase } from 'components';
+import { Formik, ErrorMessage } from 'formik';
+import * as yup from 'yup';
+import 'yup-phone';
 
-export class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
-  };
+const schema = yup.object().shape({
+  name: yup.string().min(2).required('Required field'),
+  number: yup.string().phone('UA', true, `Phone is invalid`),
+});
 
-  handleFormSubmit = e => {
-    e.preventDefault();
+const initialValues = {
+  name: '',
+  number: '',
+};
+
+export const ContactForm = ({ onSubmitForm }) => {
+  const handleFormSubmit = (values, actions) => {
     const newContact = {
       id: nanoid(5),
-      name: firstLetterToUppercase(this.state.name),
-      number: this.state.number,
+      name: firstLetterToUppercase(values.name),
+      number: values.number,
     };
 
-    const { onSubmitForm } = this.props;
     onSubmitForm(newContact);
 
-    this.resetForm();
+    actions.resetForm();
   };
 
-  handleContact = e => {
-    this.setState({
-      [e.currentTarget.name]: e.currentTarget.value,
-    });
-  };
-
-  resetForm = () => {
-    this.setState({
-      name: '',
-      number: '',
-    });
-  };
-
-  render() {
-    return (
-      <Form onSubmit={this.handleFormSubmit}>
-        <Label>
+  return (
+    <Formik
+      initialValues={initialValues}
+      validationSchema={schema}
+      onSubmit={handleFormSubmit}
+    >
+      <FormBox autoComplete="off">
+        <Label htmlFor="name">
           Enter your name
           <br />
           <Input
+            id="name"
             type="text"
             name="name"
-            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-            required
-            value={this.state.name}
-            onChange={this.handleContact}
+            placeholder="Enter your name"
           />
+          <br />
+          <ErrorMessage component={Error} name="name" />
         </Label>
         <br />
-        <Label>
+        <Label htmlFor="number">
           Enter your number
           <br />
           <Input
+            id="number"
             type="tel"
             name="number"
-            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-            required
-            value={this.state.number}
-            onChange={this.handleContact}
+            placeholder="+38 067 455 22 88"
           />
+          <br />
+          <ErrorMessage component={Error} name="number" />
         </Label>
         <br />
         <Button type="submit">Add contact</Button>
-      </Form>
-    );
-  }
-}
+      </FormBox>
+    </Formik>
+  );
+};

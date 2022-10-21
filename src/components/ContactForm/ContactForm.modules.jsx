@@ -1,6 +1,7 @@
 import styled from 'styled-components';
+import { Form, Field } from 'formik';
 
-export const Form = styled.form`
+export const FormBox = styled(Form)`
   display: inline-block;
   min-width: 300px;
   padding: 24px;
@@ -15,9 +16,9 @@ export const Label = styled.label`
   color: #2db419;
 `;
 
-export const Input = styled.input`
+export const Input = styled(Field)`
   margin-top: 10px;
-  margin-bottom: 10px;
+
   padding: 8px;
   border: 1px solid gray;
   border-radius: 4px;
@@ -42,4 +43,10 @@ export const Button = styled.button`
     background-color: #9ae68e;
     border: 1px solid #9ae68e;
   }
+`;
+
+export const Error = styled.span`
+  color: red;
+  font-size: 16px;
+  font-style: italic;
 `;
